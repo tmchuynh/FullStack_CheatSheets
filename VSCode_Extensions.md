@@ -2,8 +2,8 @@
 
 ## Shortcuts
 
-![image](/images/keyboard-shortcuts-macos.pdf)
-
+![image](/images/keyboard-shortcuts-macos.png)
+![image](/images/keyboard-shortcuts-windows.png)
 
 ### Linux
 

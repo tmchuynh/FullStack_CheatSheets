@@ -410,7 +410,6 @@ export default () => {
 
 
 #### 6. Include validations
-`Schema`
 ```js
 import { Schema, model } from 'mongoose';
 const ProductSchema = new Schema(
@@ -431,7 +430,122 @@ const ProductSchema = new Schema(
 export const Product = model('Produt', ProductSchema);
 ```
 
-`controller`
+```js
+import React, { useState } from 'react';
+
+import styles from '../Style_modules/UserForm.module.css';
+
+
+const UserForm = (props) => {
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+    const [firstNameError, setFirstNameError] = useState("");
+    const [lastNameError, setLastNameError] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+
+    const createUser = (e) => {
+        e.preventDefault();
+        const newUser = { firstName, lastName, email, password, passwordConfirmation };
+        setFirstName("")
+        setLastName("")
+        setEmail("")
+        setPassword("")
+        setPasswordConfirmation("")
+    };
+
+    const handleFirstName = (e) => {
+        setFirstName(e.target.value);
+        if (e.target.value.length < 2 && e.target.value > 0) {
+            setFirstNameError("First name is required!");
+        } else {
+            setFirstNameError("");
+        }
+    }
+
+    const handleLastName = (e) => {
+        setLastName(e.target.value);
+        if (e.target.value.length < 2 && e.target.value > 0) {
+            setLastNameError("Last name is required!");
+        } else {
+            setLastNameError("");
+        }
+    }
+
+    const handleEmail = (e) => {
+        setEmail(e.target.value);
+        if (e.target.value.length < 5 && e.target.value > 0) {
+            setEmailError("Email must be at least 5 characters long!");
+        } else {
+            setEmailError("");
+        }
+    }
+
+    const handlePassword = (e) => {
+        setPasswordConfirmation(e.target.value);
+        if (e.target.value > 0 && e.target.value !== password) {
+            setPasswordError("Passwords do not match!");
+        } else {
+            setPasswordError("");
+        }
+    }
+
+    return (
+        <div className={styles.container}>
+            <form onSubmit={createUser} className={styles.form}>
+                <div className={styles.formContainer}>
+                    <label className={styles.label}>First Name: </label>
+                    <input className={styles.input} type="text" onChange={handleFirstName} value={firstName} />
+                </div>
+                {
+                    firstNameError ?
+                        <p className={styles.error}>{firstNameError}</p> :
+                        ''
+                }
+                <div className={styles.formContainer}>
+                    <label className={styles.label}>Last Name: </label>
+                    <input className={styles.input} type="text" onChange={handleLastName} value={lastName} />
+                </div>
+                {
+                    lastNameError ?
+                        <p className={styles.error}>{lastNameError}</p> :
+                        ''
+                }
+                <div className={styles.formContainer}>
+                    <label className={styles.label}>Email: </label>
+                    <input className={styles.input} type="text" onChange={handleEmail} value={email} />
+                </div>
+                {
+                    emailError ?
+                        <p className={styles.error}>{emailError}</p> :
+                        ''
+                }
+                <div className={styles.formContainer}>
+                    <label className={styles.label}>Password: </label>
+                    <input className={styles.input} type="text" onChange={(e) => setPassword(e.target.value)} value={password} />
+                </div>
+                <div className={styles.formContainer}>
+                    <label className={styles.label}>Confirm Password: </label>
+                    <input className={styles.input} type="text" onChange={handlePassword} value={passwordConfirmation} />
+                </div>
+                {
+                    passwordError ?
+                        <p className={styles.error}>{passwordError}</p> :
+                        ''
+                }
+                <input className={styles.submit} type="submit" value="Clear Form" />
+            </form>
+
+        </div>
+    );
+};
+
+export default UserForm;
+```
+
 ```js
 import Product from '../models/products.model.js';
 

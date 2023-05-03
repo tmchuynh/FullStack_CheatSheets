@@ -23,25 +23,34 @@ dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.3
 - Since this is going into a database, best practices state we should add CreatedAt and UpdatedAt properties to all models. 
 
 ```cs
-#pragma warning disable CS8618 
+using System;
+using System.ComponentModel.DataAnnotations;
 
-using System.ComponentModel.DataAnnotations; 
+namespace YourProjectName.Models
+{
+    public class Monster
+    {
+        [Key]
+        public int MonsterId { get; set; }
+        
+        [Required]
+        public string Name { get; set; }
+        
+        public double Height { get; set; }
+        
+        [Required]
+        public string Description { get; set; }
+        
+        [DataType(DataType.DateTime)]
+        public DateTime CreatedAt { get; } = DateTime.Now;
+        
+        [DataType(DataType.DateTime)]
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        
+        // Add any additional properties or navigation properties here
+    }
+}
 
-namespace YourProjectName.Models; 
-
-public class Monster 
-
-{ 
-    [Key] 
-
-    public int MonsterId { get; set; } 
-    public string Name { get; set; }  
-    public int Height { get; set; } 
-    public string Description { get; set; } 
-    public DateTime CreatedAt { get; set; } = DateTime.Now; 
-    public DateTime UpdatedAt { get; set; } = DateTime.Now; 
-
-} 
 ```
 > Important: It is highly recommended to name your ID with the naming convention: ModelNameId! Failure to do so may cause confusion when the table is migrated into MySQL. Sometimes students experience that a separate column that follows this standard will automatically populate to "fix" the issue. This will cause several problems going forward! 
 
@@ -49,23 +58,30 @@ public class Monster
 4. Once you have all your models created, there is one more model we need to make in our Models folder. This is our context file. The context class is what forms the relationship between our models and the database. Think of it as an object that sits between our app and the database that translates our queries for us. Context classes, by convention, always have names that end in "Context". You can name the file anything (though something informative is your best option), just remember to add "Context" to the end!
 
 ```cs
-#pragma warning disable CS8618 
+using Microsoft.EntityFrameworkCore;
 
-using Microsoft.EntityFrameworkCore; 
+namespace YourProjectName.Models
+{
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-namespace YourProjectName.Models; 
+        public DbSet<Monster> Monsters { get; set; }
 
-public class MyContext : DbContext  
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
 
-{    
-    public MyContext(DbContextOptions options) : base(options) { }     
+            // Configure the Monster entity
+            modelBuilder.Entity<Monster>()
+                .ToTable("Monsters")
+                .HasKey(m => m.MonsterId);
 
+            // Add any additional configuration here
+        }
+    }
+}
 
-
-
-    public DbSet<Monster> Monsters { get; set; }  
-
-} 
 ```
 > Take a moment to go through everything happening in this file. It is very important that this is set up correctly so that everything we need is put into our database. If you forget to add a DbSet for a model, it will not appear in your database when you migrate.
 
@@ -205,24 +221,29 @@ public class HomeController : Controller
 Let's say we have a form that takes in information about a monster. You have all your validations set up and all you need now is to save your new monster to the database. To do this, you will Add the new monster to the database. Our code will look the exact same as it has in previous assignments, only now we will have two new lines of code for talking to our database: 
 
 ```cs
-[HttpPost("monsters/create")] 
-public IActionResult CreateMonster(Monster newMon) 
-{     
-    if(ModelState.IsValid) 
+[HttpPost("monsters/create")]
+public IActionResult CreateMonster(Monster newMon)
+{
+    if (ModelState.IsValid)
+    {
+        _context.Add(newMon);
+        _context.SaveChanges();
 
-    { 
-        _context.Add(newMon);     
-        _context.SaveChanges(); 
+        return RedirectToAction("SomeAction"); // Replace "SomeAction" with the name of the action method to redirect to
+    }
+    else
+    {
+        // If validation fails, add errors to the ModelState
+        foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+        {
+            // Log or handle validation errors as needed
+        }
 
-        return RedirectToAction("SomeAction"); 
+        // Return to the view to display validation errors
+        return View("Create", newMon);
+    }
+}
 
-    } else { 
-
-        // Handle unsuccessful validations 
-
-    } 
-
-} 
 ```
 
 `READ`
@@ -234,15 +255,24 @@ public IActionResult CreateMonster(Monster newMon)
 Now that we have data in our database, it's time to bring it out and render it on the screen. This is where all that work we did earlier with LINQ comes into play. Let's take a look at a few examples to see this in action: 
 
 ```cs
-[HttpGet("")]     
-public IActionResult Index()     
-{         
-    ViewBag.AllMonsters = _context.Monsters.ToList();              
-    ViewBag.AllMikes = _context.Monsters.Where(n => n.Name == "Mike");      
-    ViewBag.MostRecent = _context.Monsters.OrderByDescending(u => u.CreatedAt).Take(5).ToList();  
-    ViewBag.MatchedDesc = _context.Monsters.FirstOrDefault(u => u.Description == "Super scary"); 
-    return View();   
-} 
+[HttpGet("")]
+public IActionResult Index()
+{
+    try
+    {
+        ViewBag.AllMonsters = _context.Monsters.ToList();
+        ViewBag.AllMikes = _context.Monsters.Where(n => n.Name == "Mike").ToList(); // Add .ToList() to execute the query
+        ViewBag.MostRecent = _context.Monsters.OrderByDescending(u => u.CreatedAt).Take(5).ToList();
+        ViewBag.MatchedDesc = _context.Monsters.FirstOrDefault(u => u.Description == "Super scary");
+        return View();
+    }
+    catch (Exception ex)
+    {
+        // Log or handle the exception as needed
+        return StatusCode(500); // Return a 500 Internal Server Error response
+    }
+}
+
 ```
 
 `UPDATE`
@@ -260,24 +290,33 @@ Once you can get to an edit page, the next task is to auto-populate it with data
 ```
 
 ```cs
-[HttpPost("monsters/{MonsterId}/update")] 
-public IActionResult UpdateMonster(Monster newMon, int MonsterId) 
-{ 
-    Monster? OldMonster = _context.Monsters.FirstOrDefault(i => i.MonsterId == MonsterId); 
-    if(ModelState.IsValid) 
-    { 
-        OldMonster.Name = newMon.Name; 
-        OldMonster.Height = newMon.Height; 
-        OldMonster.Description = newMon.Description; 
-        OldMonster.UpdatedAt = DateTime.Now; 
-        _context.SaveChanges(); 
-        return RedirectToAction("Index"); 
-    } else { 
-        return View("EditMonster", OldMonster); 
+[HttpPost("monsters/{MonsterId}/update")]
+public IActionResult UpdateMonster(Monster newMon, int MonsterId)
+{
+    try
+    {
+        Monster oldMonster = _context.Monsters.FirstOrDefault(i => i.MonsterId == MonsterId);
+        if (oldMonster != null && ModelState.IsValid)
+        {
+            oldMonster.Name = newMon.Name;
+            oldMonster.Height = newMon.Height;
+            oldMonster.Description = newMon.Description;
+            oldMonster.UpdatedAt = DateTime.Now;
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+        else
+        {
+            return View("EditMonster", oldMonster);
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log or handle the exception as needed
+        return StatusCode(500); // Return a 500 Internal Server Error response
+    }
+}
 
-    } 
-
-} 
 ```
 
 ### Handling a POST Request
@@ -304,22 +343,33 @@ We use asp-action now, which relies on the name of the action rather than the na
 We can pass any parameter we want through our route using asp-route-YourParamNameHere (and you can use as many of these as you like in one form). Once this is done, we can get into the rest of the steps fairly quickly. Most of the steps are commands that should already feel familiar to you. 
 
 ```cs
-[HttpPost("monsters/{MonsterId}/update")] 
-public IActionResult UpdateMonster(Monster newMon, int MonsterId) 
-{ 
-    Monster? OldMonster = _context.Monsters.FirstOrDefault(i => i.MonsterId == MonsterId); 
-    if(ModelState.IsValid) { 
-        OldMonster.Name = newMon.Name; 
-        OldMonster.Height = newMon.Height; 
-        OldMonster.Description = newMon.Description; 
-        OldMonster.UpdatedAt = DateTime.Now; 
-        _context.SaveChanges(); 
-        return RedirectToAction("Index"); 
-    } else { 
-        return View("EditMonster", OldMonster); 
-    } 
+[HttpPost("monsters/{MonsterId}/update")]
+public IActionResult UpdateMonster(Monster newMon, int MonsterId)
+{
+    try
+    {
+        Monster oldMonster = _context.Monsters.FirstOrDefault(i => i.MonsterId == MonsterId);
+        if (oldMonster != null && ModelState.IsValid)
+        {
+            oldMonster.Name = newMon.Name;
+            oldMonster.Height = newMon.Height;
+            oldMonster.Description = newMon.Description;
+            oldMonster.UpdatedAt = DateTime.Now;
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+        else
+        {
+            return View("EditMonster", oldMonster);
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log or handle the exception as needed
+        return StatusCode(500); // Return a 500 Internal Server Error response
+    }
+}
 
-} 
 ```
 
 `DELETE`
@@ -343,17 +393,21 @@ With our post request triggered, we can head to our controller to handle it. The
 
 ```cs
 [HttpPost("monsters/{MonsterId}/destroy")] 
-
 public IActionResult DestroyMonster(int MonsterId) 
-
 { 
-
     Monster? MonToDelete = _context.Monsters.SingleOrDefault(i => i.MonsterId == MonsterId); 
-    _context.Monsters.Remove(MonToDelete); 
-    _context.SaveChanges(); 
-    return RedirectToAction("Index"); 
+    if (MonToDelete == null) 
+    { 
+        return NotFound(); // return a 404 Not Found status code
+    } 
+    else 
+    { 
+        _context.Monsters.Remove(MonToDelete); 
+        _context.SaveChanges(); 
+        return RedirectToAction("Index"); 
+    } 
+}
 
-} 
 ```
 
 ### SingleOrDefault vs FirstOrDefault 

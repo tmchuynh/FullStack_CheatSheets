@@ -1,4 +1,22 @@
 # Intro
+
+- [Database Side Part 1](#database-Side-Part-1)
+- [Client side](#client-side)
+- [Database Side Part 2](#database-Side-Part-2)
+  - [Create your controller file](#create-your-controller-file)
+  - [Create your routes file](#create-your-routes-file)
+  - [Create your model file](#create-your-model-file)
+  - [Create a form](#create-a-form)
+  - [Create your Main.js](#create-your-Main.js)
+  - [Include validations](#include-validations)
+- [Advanced MERN](#advanced-MERN)
+  - [Downloading Bootstrap](#downloading-bootstrap)
+  - [Install React Bootstrap](#install-react-bootstrap)
+  - [Install Material-UI](#install-material-UI)
+  - [Install Semantic UI React](#install-semantic-UI-react)
+
+
+  
 Up to this point, we have been separating our front end and backend entirely. When we use create-react-app, we use the command npm run start to serve our React application. However, we will want to include React within our Express project.
 
 The way we will do this is by building our React project so that it creates the HTML, CSS, and Javascript files we need for our SPA. Then, we can point to it within our Express project. In the following lessons, we will learn how to set up our Full Stack MERN project and tie all of the technologies together.

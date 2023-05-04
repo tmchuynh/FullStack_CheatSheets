@@ -8,6 +8,9 @@ We will be using Axios in our React project to communicate with our server. It i
 ---
 
 ## Full Stack MERN
+![MERN_File_Structure](/images/MERN_File_Structure.png)
+
+
 Using a server folder with the config, routes, etc. and a client folder with the npx create-react-app... etc. 
 
 ### Database Side Part 1

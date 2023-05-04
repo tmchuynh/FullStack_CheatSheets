@@ -1,19 +1,19 @@
 # Intro
 
 - [Database Side Part 1](#database-side-part-1)
-- [Client Side](#client-side)
+- [Client side](#client-side)
 - [Database Side Part 2](#database-side-part-2)
-  - [Create Your Controller File](#create-your-controller-file)
-  - [Create Your Routes File](#create-your-routes-file)
-  - [Create Your Model File](#create-your-model-file)
-  - [Create a Form](#create-a-form)
-  - [Create Your Main.js](#create-your-mainjs)
-  - [Include Validations](#include-validations)
+  - [1. Create your controller file](#1-create-your-controller-file)
+  - [2. Create your routes file](#2-create-your-routes-file)
+  - [3. Create your model file](#3-create-your-model-file)
+  - [4. Create a form](#4-create-a-form)
+  - [5. Create your Main.js](#5-create-your-mainjs)
+  - [6. Include validations](#6-include-validations)
 - [Advanced MERN](#advanced-mern)
-  - [Downloading Bootstrap](#downloading-bootstrap)
-  - [Install React Bootstrap](#install-react-bootstrap)
-  - [Install Material-UI](#install-material-ui)
-  - [Install Semantic UI React](#install-semantic-ui-react)
+  - [1. Downloading Bootstrap](#1-downloading-bootstrap)
+  - [2. Install React Bootstrap](#2-install-react-bootstrap)
+  - [3. Install Material-UI](#3-install-material-ui)
+  - [4. Install Semantic UI React](#4-install-semantic-ui-react)
 
 
 

@@ -11,9 +11,9 @@
   - [6. Include validations](#6-include-validations)
 - [Advanced MERN](#advanced-mern)
   - [1. Downloading Bootstrap](#1-downloading-bootstrap)
-  - [2. Install React Bootstrap](#2-install-react-bootstrap)
-  - [3. Install Material-UI](#3-install-material-ui)
-  - [4. Install Semantic UI React](#4-install-semantic-ui-react)
+  - [2. Install React Bootstrap](#1-install-react-bootstrap)
+  - [3. Install Material-UI](#1-install-material-ui)
+  - [4. Install Semantic UI React](#1-install-semantic-ui-react)
 
 
 

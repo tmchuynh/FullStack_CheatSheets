@@ -701,7 +701,7 @@ reportWebVitals();
 #### 3. Reload your application
 
 ### Using `React-Boostrap` for your css [https://react-bootstrap.github.io/forms/form-text/](https://react-bootstrap.github.io/forms/form-text/)
-#### 1. Install Material-UI
+#### 1. Install React Bootstrap
 ```
 npm install react-bootstrap bootstrap
 ```

@@ -41,9 +41,9 @@ mkdir myNewProject
 cd myNewProject
 ```
 
-#### 2. Create your config, controller, model, and routes folders
+#### 2. Create your config, controllers, models, and routes folders
 ```
-mkdir config controller model routes
+mkdir config controllers models routes
 
 cd ..
 ```
